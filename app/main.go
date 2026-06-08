@@ -23,6 +23,12 @@ func main() {
 			os.Exit(0)
 		}
 
+		before, after, _ := strings.Cut(cmd, " ")
+		if before == "echo" {
+			fmt.Println(after)
+			continue
+		}
+
 		fmt.Printf("%s: command not found\n", cmd)
 	}
 }

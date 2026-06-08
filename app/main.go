@@ -23,9 +23,8 @@ func main() {
 			os.Exit(0)
 		}
 
-		before, after, _ := strings.Cut(cmd, " ")
-		if before == "echo" {
-			fmt.Println(after)
+		if strings.HasPrefix(cmd, "echo ") {
+			fmt.Println(cmd[5:])
 			continue
 		}
 

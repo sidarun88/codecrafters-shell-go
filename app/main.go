@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"os/exec"
 	"slices"
 	"strings"
 )
@@ -27,20 +28,51 @@ func main() {
 		case "echo":
 			fmt.Println(args)
 		case "type":
-			typeCmdOutput(args)
+			checkCmdType(args)
 		default:
-			fmt.Printf("%s: command not found\n", cmd)
+			checkAndRunCmd(prog, args)
 		}
 	}
 }
 
-func typeCmdOutput(args string) {
+func checkAndRunCmd(prog string, args string) {
+	progPath := getFullExecPath(prog)
+	if progPath == "" {
+		fmt.Printf("%s: command not found\n", prog)
+		return
+	}
+
+	cmd := exec.Command(progPath, strings.Split(args, " ")...)
+
+	// Redirect command output directly to the terminal standard streams
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	// Run() starts the process and blocks until completion
+	err := cmd.Run()
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+func checkCmdType(args string) {
 	builtinCommands := []string{"exit", "echo", "type"}
 	if slices.Contains(builtinCommands, args) {
 		fmt.Printf("%s is a shell builtin\n", args)
 		return
 	}
 
+	// Check if args is executable
+	execPath := getFullExecPath(args)
+	if execPath != "" {
+		fmt.Printf("%s is %s\n", args, execPath)
+		return
+	}
+
+	fmt.Printf("%s: not found\n", args)
+}
+
+func getFullExecPath(progNameOrArgs string) string {
 	// Search for everything in path
 	paths := os.Getenv("PATH")
 	executableDirs := strings.SplitSeq(paths, string(os.PathListSeparator))
@@ -48,18 +80,17 @@ func typeCmdOutput(args string) {
 	// Iterate over all the directories to check if
 	// the command is found in any dir and is an executable
 	for dirPath := range executableDirs {
-		isExecutable, execCheckErr := checkFileIsExecutable(dirPath, args)
-		if execCheckErr != nil {
+		isExecutable, err := checkFileIsExecutable(dirPath, progNameOrArgs)
+		if err != nil {
 			continue
 		}
 
 		if isExecutable {
-			fmt.Printf("%s is %s/%s\n", args, dirPath, args)
-			return
+			return fmt.Sprintf("%s%c%s", dirPath, os.PathSeparator, progNameOrArgs)
 		}
 	}
 
-	fmt.Printf("%s: not found\n", args)
+	return ""
 }
 
 func checkFileIsExecutable(dirPath string, progName string) (bool, error) {

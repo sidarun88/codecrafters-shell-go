@@ -42,9 +42,11 @@ func checkAndRunCmd(prog string, args string) {
 		return
 	}
 
-	cmd := exec.Command(prog, strings.Split(args, " ")...)
+	arguments := strings.Fields(args)
+	cmd := exec.Command(prog, arguments...)
 
-	// Redirect command output directly to the terminal standard streams
+	// Redirect command output directly to the
+	// terminal standard streams
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 

@@ -30,11 +30,21 @@ func main() {
 		case "type":
 			checkCmdType(args)
 		case "pwd":
-			checkAndRunCmd(prog, args)
+			execPwd()
 		default:
 			checkAndRunCmd(prog, args)
 		}
 	}
+}
+
+func execPwd() {
+	currDir, err := os.Getwd()
+	if err != nil {
+		fmt.Printf("Error finding current dir: %s\n", err)
+		return
+	}
+
+	fmt.Println(currDir)
 }
 
 func checkAndRunCmd(prog string, args string) {

@@ -40,9 +40,15 @@ func main() {
 }
 
 func execChangeDir(args string) {
-	err := os.Chdir(args)
+	dirPath := args
+	if strings.HasPrefix(dirPath, "~") {
+		homeDir := os.Getenv("HOME")
+		dirPath = strings.Replace(dirPath, "~", homeDir, 1)
+	}
+
+	err := os.Chdir(dirPath)
 	if err != nil {
-		fmt.Printf("cd: %s: No such file or directory\n", args)
+		fmt.Printf("cd: %s: No such file or directory\n", dirPath)
 	}
 }
 

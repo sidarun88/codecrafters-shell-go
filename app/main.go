@@ -31,9 +31,18 @@ func main() {
 			checkCmdType(args)
 		case "pwd":
 			execPwd()
+		case "cd":
+			execChangeDir(args)
 		default:
 			checkAndRunCmd(prog, args)
 		}
+	}
+}
+
+func execChangeDir(args string) {
+	err := os.Chdir(args)
+	if err != nil {
+		fmt.Printf("cd: %s: No such file or directory\n", args)
 	}
 }
 

@@ -84,7 +84,7 @@ func checkFileIsExecutable(dirPath string, progName string) (bool, error) {
 				return false, infoErr
 			}
 
-			isExecutable := fileInfo.Mode()&0111 != 0
+			isExecutable := fileInfo.Mode().Perm()&0111 != 0
 			return isExecutable, nil
 		}
 	}

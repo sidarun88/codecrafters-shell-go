@@ -29,6 +29,8 @@ func main() {
 			fmt.Println(args)
 		case "type":
 			checkCmdType(args)
+		case "pwd":
+			checkAndRunCmd(prog, args)
 		default:
 			checkAndRunCmd(prog, args)
 		}
@@ -58,7 +60,7 @@ func checkAndRunCmd(prog string, args string) {
 }
 
 func checkCmdType(args string) {
-	builtinCommands := []string{"exit", "echo", "type"}
+	builtinCommands := []string{"exit", "echo", "type", "pwd"}
 	if slices.Contains(builtinCommands, args) {
 		fmt.Printf("%s is a shell builtin\n", args)
 		return

@@ -51,7 +51,7 @@ func checkAndRunCmd(prog string, args string) {
 	// Run() starts the process and blocks until completion
 	err := cmd.Run()
 	if err != nil {
-		fmt.Println(err)
+		fmt.Printf("Error running %s: %s\n", prog, err)
 	}
 }
 

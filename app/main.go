@@ -41,5 +41,53 @@ func typeCmdOutput(args string) {
 		return
 	}
 
+	// Search for everything in path
+	paths := os.Getenv("PATH")
+	executableDirs := strings.SplitSeq(paths, string(os.PathListSeparator))
+
+	// Iterate over all the directories to check if
+	// the command is found in any dir and is an executable
+	for dirPath := range executableDirs {
+		isExecutable, execCheckErr := checkFileIsExecutable(dirPath, args)
+		if execCheckErr != nil {
+			continue
+		}
+
+		if isExecutable {
+			fmt.Printf("%s is %s/%s\n", args, dirPath, args)
+			return
+		}
+	}
+
 	fmt.Printf("%s: not found\n", args)
+}
+
+func checkFileIsExecutable(dirPath string, progName string) (bool, error) {
+	dirInfo, err := os.Stat(dirPath)
+	if err != nil {
+		return false, err
+	}
+
+	if !dirInfo.IsDir() {
+		return false, fmt.Errorf("%s is not a directory", dirPath)
+	}
+
+	entries, err := os.ReadDir(dirPath)
+	if err != nil {
+		return false, err
+	}
+
+	for _, entry := range entries {
+		if entry.Name() == progName && !entry.IsDir() {
+			fileInfo, infoErr := entry.Info()
+			if infoErr != nil {
+				return false, infoErr
+			}
+
+			isExecutable := fileInfo.Mode()&0111 != 0
+			return isExecutable, nil
+		}
+	}
+
+	return false, nil
 }

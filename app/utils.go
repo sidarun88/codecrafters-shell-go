@@ -62,16 +62,33 @@ func parseArgs(input string) []string {
 	var args []string
 	var builder strings.Builder
 
-	inQuotes := false
+	inSingleQuotes := false
+	inDoubleQuotes := false
 	hasContent := false
 
 	for _, r := range input {
 		switch {
 		case r == '\'':
-			// Toggle quote state
-			inQuotes = !inQuotes
-			hasContent = true
-		case inQuotes:
+			if !inDoubleQuotes {
+				// Toggle single quote state
+				inSingleQuotes = !inSingleQuotes
+				hasContent = true
+			} else {
+				// Inside double quotes, take everything literally
+				builder.WriteRune(r)
+				hasContent = true
+			}
+		case r == '"':
+			if !inSingleQuotes {
+				// Toggle double quote state
+				inDoubleQuotes = !inDoubleQuotes
+				hasContent = true
+			} else {
+				// Inside single quotes, take everything literally
+				builder.WriteRune(r)
+				hasContent = true
+			}
+		case inSingleQuotes || inDoubleQuotes:
 			// Inside quotes, take everything literally
 			builder.WriteRune(r)
 			hasContent = true

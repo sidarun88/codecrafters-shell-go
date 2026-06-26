@@ -64,10 +64,26 @@ func parseArgs(input string) []string {
 
 	inSingleQuotes := false
 	inDoubleQuotes := false
+	besideBackSlash := false
 	hasContent := false
 
 	for _, r := range input {
+		if besideBackSlash {
+			builder.WriteRune(r)
+			besideBackSlash = false
+			hasContent = true
+			continue
+		}
+
 		switch {
+		case r == '\\':
+			if !inSingleQuotes && !inDoubleQuotes {
+				besideBackSlash = true
+				hasContent = true
+			} else {
+				builder.WriteRune(r)
+				hasContent = true
+			}
 		case r == '\'':
 			if !inDoubleQuotes {
 				// Toggle single quote state

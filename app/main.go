@@ -22,6 +22,10 @@ func main() {
 
 		cmd = strings.TrimSpace(cmd)
 		cmdArgs := parseArgs(cmd)
+		if len(cmdArgs) == 0 {
+			continue
+		}
+
 		prog, args := cmdArgs[0], cmdArgs[1:]
 		switch prog {
 		case "exit":

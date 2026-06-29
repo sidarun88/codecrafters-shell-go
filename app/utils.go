@@ -67,7 +67,7 @@ func parseArgs(input string) []string {
 	besideBackSlash := false
 	hasContent := false
 
-	for _, r := range input {
+	for i, r := range input {
 		if besideBackSlash {
 			builder.WriteRune(r)
 			besideBackSlash = false
@@ -80,6 +80,14 @@ func parseArgs(input string) []string {
 			if !inSingleQuotes && !inDoubleQuotes {
 				besideBackSlash = true
 				hasContent = true
+			} else if inDoubleQuotes {
+				if input[i+1] == '"' || input[i+1] == '\\' {
+					besideBackSlash = true
+					hasContent = true
+				} else {
+					builder.WriteRune(r)
+					hasContent = true
+				}
 			} else {
 				builder.WriteRune(r)
 				hasContent = true
